@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexedDB Example</title>
+    <script>
+        const DB_NAME = 'items_database';
+        const DB_VERSION = 1;
+        let db;
+
+        async function initDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = (event) => {
+                    console.error("Database error:", event.target.errorCode);
+                    reject(event.target.errorCode);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    const objectStore = db.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
+                    objectStore.createIndex('item', 'item', { unique: false });
+                    objectStore.createIndex('cost', 'cost', { unique: false });
+                    objectStore.createIndex('year', 'year', { unique: false });
+                    objectStore.createIndex('month', 'month', { unique: false });
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                };
+            });
+        }
+
+        async function addItem(item, cost, year, month) {
+            const transaction = db.transaction(['items'], 'readwrite');
+            const objectStore = transaction.objectStore('items');
+
+            return new Promise((resolve, reject) => {
+                const request = objectStore.add({ item, cost, year, month });
+
+                request.onsuccess = () => {
+                    resolve();
+                };
+
+                request.onerror = (event) => {
+                    console.error("Error adding item:", event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        async function getItemsByMonthAndYear(year, month) {
+            const transaction = db.transaction(['items'], 'readonly');
+            const objectStore = transaction.objectStore('items');
+            const index = objectStore.index('year');
+            const range = IDBKeyRange.only(year);
+            const items = [];
+
+            return new Promise((resolve, reject) => {
+                index.openCursor(range).onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        if (cursor.value.month === month) {
+                            items.push(cursor.value);
+                        }
+                        cursor.continue();
+                    } else {
+                        resolve(items);
+                    }
+                };
+
+                transaction.onerror = (event) => {
+                    console.error("Error fetching items:", event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        async function handleAddItem() {
+            const item = document.getElementById('item').value;
+            const cost = document.getElementById('cost').value;
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+
+            try {
+                await addItem(item, cost, year, month);
+                console.log("Item added successfully!");
+            } catch (error) {
+                console.error("Failed to add item:", error);
+            }
+        }
+
+        async function handleShowReport() {
+            const year = document.getElementById('reportYear').value;
+            const month = document.getElementById('reportMonth').value;
+
+            try {
+                const items = await getItemsByMonthAndYear(year, month);
+                const reportContainer = document.getElementById('reportContainer');
+                reportContainer.innerHTML = ''; // Clear previous report
+
+                if (items.length === 0) {
+                    reportContainer.textContent = "No items found for the specified month and year.";
+                } else {
+                    const ul = document.createElement('ul');
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = `Item: ${item.item}, Cost: ${item.cost}, Year: ${item.year}, Month: ${item.month}`;
+                        ul.appendChild(li);
+                    });
+                    reportContainer.appendChild(ul);
+                }
+            } catch (error) {
+                console.error("Failed to fetch items:", error);
+            }
+        }
+
+        async function init() {
+            try {
+                await initDatabase();
+                console.log("Database initialized successfully!");
+            } catch (error) {
+                console.error("Failed to initialize database:", error);
+            }
+        }
+
+        init();
+    </script>
+</head>
+<body>
+<h2>Add Item</h2>
+<label for="item">Item:</label>
+<input type="text" id="item"><br><br>
+<label for="cost">Cost:</label>
+<input type="text" id="cost"><br><br>
+<label for="year">Year:</label>
+<input type="text" id="year"><br><br>
+<label for="month">Month:</label>
+<input type="text" id="month"><br><br>
+<button onclick="handleAddItem()">Add Item</button>
+
+<h2>Show Report</h2>
+<label for="reportYear">Year:</label>
+<input type="text" id="reportYear"><br><br>
+<label for="reportMonth">Month:</label>
+<input type="text" id="reportMonth"><br><br>
+<button onclick="handleShowReport()">Show Report</button>
+
+<div id="reportContainer"></div>
+
+</body>
+</html>
