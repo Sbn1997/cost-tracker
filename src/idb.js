@@ -1,3 +1,6 @@
+/* Yarin Ben Moshe 314939885
+Amit Rahamim 318816535
+Shahar Ben Naim 208628453 */
 
 let db;
         async function initDatabase(DB_NAME, DB_VERSION) {
