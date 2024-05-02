@@ -2,6 +2,7 @@
 Amit Rahamim 318816535
 Shahar Ben Naim 208628453 */
 
+// Import everything required
 import './App.css';
 import * as dbModule from './db'
 import React, { useState } from 'react';
