@@ -5,7 +5,7 @@ Shahar Ben Naim 208628453 */
 const DB_NAME = 'items_database';
         const DB_VERSION = 1;
         let db;
-
+        // Initialize our IndexDB database
         async function initDatabase() {
             return new Promise((resolve, reject) => {
                 const request = window.indexedDB.open(DB_NAME, DB_VERSION);
@@ -14,8 +14,8 @@ const DB_NAME = 'items_database';
                     console.error("Database error:", event.target.errorCode);
                     reject(event.target.errorCode);
                 };
-
-                request.onupgradeneeded = (event) => {
+                
+                request.onupgradeneeded = (event) => { 
                     const db = event.target.result;
                     const objectStore = db.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
                     objectStore.createIndex('cost', 'cost', { unique: false });
@@ -32,6 +32,7 @@ const DB_NAME = 'items_database';
             });
         }
 
+        // Add  an item to the table
         async function addItem( cost,description,category, year, month) {
             console.log("addItem Called")
             const transaction = db.transaction(['items'], 'readwrite');
@@ -51,7 +52,7 @@ const DB_NAME = 'items_database';
                 };
             });
         }
-
+        // Delete an item from the DB
         async function deleteItemById( id ) {
             console.log("deleteItem Called")
             console.log(id)
@@ -105,9 +106,9 @@ const DB_NAME = 'items_database';
         async function getItemsByDateRange(startYear, startMonth, endYear, endMonth) {
             const transaction = db.transaction(['items'], 'readonly');
             const objectStore = transaction.objectStore('items');
-            const index = objectStore.index('year'); // Assuming you have an index on 'year'.
+            const index = objectStore.index('year'); // Assuming there is index existing in 'year'
             
-            // Creating a range for years.
+            // Creating a range for years
             const yearRange = IDBKeyRange.bound(startYear, endYear);
             const items = [];
         
@@ -142,6 +143,7 @@ const DB_NAME = 'items_database';
 
           };
 
+        // Here we do everything related to adding a new item
         async function handleAddItem() {
             const cost = document.getElementById('cost').value;
             const description = document.getElementById('description').value;
@@ -156,7 +158,7 @@ const DB_NAME = 'items_database';
                 console.error("Failed to add item:", error);
             }
         }
-
+        // Here we do everything related to the show report function/button
         async function handleShowReport() {
             const year = document.getElementById('reportYear').value;
             const month = document.getElementById('reportMonth').value;
@@ -168,7 +170,7 @@ const DB_NAME = 'items_database';
 
                 if (items.length === 0) {
                     reportContainer.textContent = "No items found for the specified month and year.";
-                } else {
+                } else { // Show the results
                     const ul = document.createElement('ul');
                     items.forEach(item => {
                         const li = document.createElement('li');
@@ -206,7 +208,7 @@ const DB_NAME = 'items_database';
         //     });
         // }
 
-        async function init() {
+        async function init() { // Initialize our database
             try {
                 await initDatabase();
                 console.log("Database initialized successfully!");
