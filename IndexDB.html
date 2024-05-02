@@ -5,13 +5,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IndexedDB Example</title>
+    <title>IndexedDB FED Project</title>
     <script>
         const DB_NAME = 'items_database';
         const DB_VERSION = 1;
         let db;
 
-        async function initDatabase() {
+        async function initDatabase() { // Initialize our IndexedDB
             return new Promise((resolve, reject) => {
                 const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -35,7 +35,7 @@
                 };
             });
         }
-
+        // Add item and cost to our DB asynchronously
         async function addItem(item, cost, year, month) {
             const transaction = db.transaction(['items'], 'readwrite');
             const objectStore = transaction.objectStore('items');
@@ -53,7 +53,7 @@
                 };
             });
         }
-
+        // Show item and cost by a specific cost and year asynchronously using our DB
         async function getItemsByMonthAndYear(year, month) {
             const transaction = db.transaction(['items'], 'readonly');
             const objectStore = transaction.objectStore('items');
@@ -80,7 +80,7 @@
                 };
             });
         }
-
+        // Call our add item function asynchronously with the right values we gained from the user's input
         async function handleAddItem() {
             const item = document.getElementById('item').value;
             const cost = document.getElementById('cost').value;
@@ -94,7 +94,7 @@
                 console.error("Failed to add item:", error);
             }
         }
-
+        // Call our show report function asynchronously with the right values we gained from the user's input
         async function handleShowReport() {
             const year = document.getElementById('reportYear').value;
             const month = document.getElementById('reportMonth').value;
@@ -106,7 +106,7 @@
 
                 if (items.length === 0) {
                     reportContainer.textContent = "No items found for the specified month and year.";
-                } else {
+                } else { // Items exist, so show them
                     const ul = document.createElement('ul');
                     items.forEach(item => {
                         const li = document.createElement('li');
@@ -120,7 +120,7 @@
             }
         }
 
-        async function init() {
+        async function init() { // Initialize our IndexedDB
             try {
                 await initDatabase();
                 console.log("Database initialized successfully!");
@@ -133,6 +133,7 @@
     </script>
 </head>
 <body>
+// Labels and buttons which starts the required functionalities
 <h2>Add Item</h2>
 <label for="item">Item:</label>
 <input type="text" id="item"><br><br>
