@@ -3,6 +3,7 @@ Amit Rahamim 318816535
 Shahar Ben Naim 208628453 */
 
 let db;
+        // Initialize our DB
         async function initDatabase(DB_NAME, DB_VERSION) {
             return new Promise((resolve, reject) => {
                 const request = window.indexedDB.open(DB_NAME, DB_VERSION);
@@ -28,10 +29,10 @@ let db;
                 };
             });
         }
+        // Add an item and its cost after being called from handleAddCost
+        async function addCost(cost,category,description) {
 
-        async function addCost( cost,category,description) {
-
-            console.log("addItem Called")
+            console.log("addCost Called")
 
             const today = new Date();
 
@@ -55,7 +56,8 @@ let db;
             });
         }
 
-        async function deleteItemById( id ) {
+        // Delete item by its ID
+        async function deleteItemById(id) {
             console.log("deleteItem Called")
             console.log(id)
             const transaction = db.transaction(['items'], 'readwrite');
@@ -77,7 +79,7 @@ let db;
         }
 
       
-
+        // Get results of items added in a specific month and year
         async function getItemsByMonthAndYear(year, month) {
             const transaction = db.transaction(['items'], 'readonly');
             const objectStore = transaction.objectStore('items');
@@ -104,7 +106,7 @@ let db;
                 };
             });
         }
-
+        // Get items by a date range
         async function getItemsByDateRange(startYear, startMonth, endYear, endMonth) {
             const transaction = db.transaction(['items'], 'readonly');
             const objectStore = transaction.objectStore('items');
@@ -139,12 +141,12 @@ let db;
                 };
             });
         }
-
+        // Call our get items by date range function asynchronously
         const handleReportRange = async (startYear, startMonth, endYear, endMonth) => {
             const fetchedItems = await getItemsByDateRange(startYear, startMonth, endYear, endMonth);
 
           };
-
+        // Call our addItem function asynchronously
         async function handleAddItem() {
             const cost = document.getElementById('cost').value;
             const description = document.getElementById('description').value;
@@ -159,7 +161,7 @@ let db;
                 console.error("Failed to add item:", error);
             }
         }
-
+        // Call our show report function asynchronously
         async function handleShowReport() {
             const year = document.getElementById('reportYear').value;
             const month = document.getElementById('reportMonth').value;
@@ -171,7 +173,7 @@ let db;
 
                 if (items.length === 0) {
                     reportContainer.textContent = "No items found for the specified month and year.";
-                } else {
+                } else { // Items exist, then show them
                     const ul = document.createElement('ul');
                     items.forEach(item => {
                         const li = document.createElement('li');
@@ -208,7 +210,7 @@ let db;
         //         };
         //     });
         // }
-
+        // Initialize our DB asynchronously
         async function openCostsDB(db_name, ver) {
             try {
                 const dbConnection = await initDatabase(db_name, ver);
