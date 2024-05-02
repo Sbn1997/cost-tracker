@@ -1,3 +1,7 @@
+/* Yarin Ben Moshe 314939885
+Amit Rahamim 318816535
+Shahar Ben Naim 208628453 */
+
 const DB_NAME = 'items_database';
         const DB_VERSION = 1;
         let db;
