@@ -2,6 +2,7 @@
 Amit Rahamim 318816535
 Shahar Ben Naim 208628453 */
 
+// Import the needed react files
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
